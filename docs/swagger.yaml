@@ -1,0 +1,53 @@
+basePath: /
+info:
+  contact: {}
+  description: This is a sample Server pets
+  license: {}
+  title: Swagger Example API
+  version: 0.0.1
+paths:
+  /api/:
+    get:
+      consumes:
+      - application/json
+      description: 获取省级地区列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"获取成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 获取中国省级地区列表
+      tags:
+      - Province
+  /api/getCateList/{selectType}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 获取不同数据类型
+        in: path
+        name: selectType
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"获取成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 获取分类列表信息
+      tags:
+      - GetCateList
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: x-token
+    type: apiKey
+swagger: "2.0"
