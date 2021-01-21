@@ -1,4 +1,6 @@
-# 开发流程
+# 开箱即用的Gin开发流程
+
+## 开发流程
 
 - clone代码
 	git clone https://github.com/liaoguiming/my-gin.git
@@ -17,3 +19,7 @@
 - swag init生成api文档
 
 - go run main.go
+
+## 开发环境
+
+- GoLang Gin Mysql Redis Swagger

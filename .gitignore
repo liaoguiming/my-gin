@@ -5,4 +5,5 @@ main.exe
 /log
 .gitignore
 /.git
+/docs
 
