@@ -3,4 +3,6 @@ go.mod
 go.sum
 main.exe
 /log
+.gitignore
+/.git
 
