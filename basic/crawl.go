@@ -1,24 +1,63 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 type Fetcher interface {
 	//返回URL body的内容,并且将在这个页面上找到的URl放入一个slice中
 	Fetch(url string) (body string, urls []string, err error)
 }
 
-func Crawl(url string, depth int, fetcher Fetcher) {
+type safeState struct {
+	v   map[string]bool
+	mux sync.Mutex
+}
+
+//使用sync.Mutex保证不同协程间保存url不冲突
+func (c *safeState) setState(key string, state bool) {
+	c.mux.Lock()
+	c.v[key] = state
+	c.mux.Unlock()
+}
+
+//验证url是否重复
+func (c *safeState) value(key string) (bool, bool) {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	v, ok := c.v[key]
+	return v, ok
+}
+
+var urlState = safeState{v: make(map[string]bool)}
+
+func Crawl(url string, depth int, fetcher Fetcher, ch chan int) {
+	defer func() {
+		ch <- 1
+	}()
 	if depth < 0 {
 		return
 	}
+	//验证urlState是否包含url 包含则不抓取该URL
+	if _, ok := urlState.value(url); ok {
+		return
+	}
+	urlState.setState(url, false)
+	defer urlState.setState(url, true)
 	body, urls, err := fetcher.Fetch(url)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("found:%s %q\n", url, body)
+	subChan := make(chan int)
+	fmt.Printf("found:%s %q\n", url, body)
 	for _, u := range urls {
-		Crawl(u, depth-1, fetcher)
+		go Crawl(u, depth-1, fetcher, subChan)
+	}
+
+	for i := 0; i < len(urls); i++ {
+		<-subChan
 	}
 	return
 }
@@ -72,6 +111,7 @@ var fetcher = fakeFetcher{
 }
 
 func main() {
-	alreadyCrawl := make(map[int]string)
-	Crawl("https://golang.org/", 4, fetcher)
+	ch := make(chan int, 4)
+	go Crawl("https://golang.org/", 4, fetcher, ch)
+	<-ch
 }
