@@ -6,8 +6,10 @@ import (
 	"liao/global"
 	"liao/global/response"
 	"liao/model"
+	"liao/utils"
 	"time"
 )
+
 // @title 获取省级名称列表
 // @version v1
 // @description 获取省级地区列表
@@ -35,7 +37,7 @@ func Province(c *gin.Context) {
 	response.OkWithData(area, c)
 }
 
-// @Tags GetCateList
+// @Tags category
 // @Summary 获取分类列表信息
 // @Security ApiKeyAuth
 // @accept application/json
@@ -67,4 +69,23 @@ func GetCateList(c *gin.Context) {
 	default:
 		response.OkWithMessage("nothing", c)
 	}
+}
+
+// @Tags category
+// @Summary 获取小程序主页面分类
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
+// @Router /api/getMainCategory [get]
+func GetMainCategory(c *gin.Context) {
+	var mainCatInfo []model.Categories
+	db := global.DB.Table("categories cat").Select("distinct cat.name,cat.id").Joins("inner join articles art on art.category_id = cat.id").Where("cat.sort = 2")
+	db.Find(&mainCatInfo)
+	if len(mainCatInfo) == 0 {
+		response.FailWithMessage("暂无分类", c)
+		return
+	}
+	res := utils.SetOrGetRedisKey("mainCategory", mainCatInfo, true)
+	response.OkWithData(res, c)
 }
