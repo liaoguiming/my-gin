@@ -1,4 +1,4 @@
-package main
+package basic
 import "fmt"
 import "os"
 import "bufio"
