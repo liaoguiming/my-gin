@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/Gre-Z/common/jtime"
+	//"github.com/Gre-Z/common/jtime"
 )
 
 type Article struct {
@@ -9,7 +9,7 @@ type Article struct {
 	CategoryId  int
 	Title       string
 	Description string
-	CreatedAt   jtime.JsonTime
+	//CreatedAt   jtime.JsonTime
 }
 
 type ArticleDetail struct {
