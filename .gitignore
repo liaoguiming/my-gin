@@ -6,4 +6,5 @@ main.exe
 .gitignore
 /.git
 /docs
+/docker/data
 
